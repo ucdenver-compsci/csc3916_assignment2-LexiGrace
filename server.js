@@ -72,28 +72,67 @@ router.post('/signin', (req, res) => {
     }
 });
 
-router.route('/testcollection')
+router.route('/movies')
+    //delete = complete
     .delete(authController.isAuthenticated, (req, res) => {
-        console.log(req.body);
-        res = res.status(200);
-        if (req.get('Content-Type')) {
-            res = res.type(req.get('Content-Type'));
-        }
         var o = getJSONObjectForMovieRequirement(req);
+        var user = db.findOne(req.body.username);
+        movieID=(req.body);
+        if (!user) {
+            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});}
+        else {
+            if (req.body.password == user.password) {
+                var userToken = { id: user.id, username: user.username };
+                var token = jwt.sign(userToken, process.env.SECRET_KEY);
+                db.remove.movieID;
+                res.json({'status': 200, msg: "movie deleted", headers: o.headers, query: o.query, env: process.env.UNIQUE_KEY});
+                }
+            else{
+                res.status(401).send({success: false, msg: 'Authentication failed.'});
+                }}
         res.json(o);
     }
     )
     .put(authJwtController.isAuthenticated, (req, res) => {
         console.log(req.body);
-        res = res.status(200);
-        if (req.get('Content-Type')) {
-            res = res.type(req.get('Content-Type'));
-        }
         var o = getJSONObjectForMovieRequirement(req);
+        var user = db.findOne(req.body.username);
+        if (!user) {
+            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});}
+            else {
+                if (req.body.password == user.password) {
+                    var userToken = { id: user.id, username: user.username };
+                    var token = jwt.sign(userToken, process.env.SECRET_KEY);
+                    res.json({'status': 200, msg: "movie updated", o});
+                }
+                else{
+                    res.status(401).send({success: false, msg: 'Authentication failed.'});
+                }}
+        
         res.json(o);
-    }
-    );
+    })
+
+    .get((req, res) => {
+        console.log(req.body);
+        var o=getJSONObjectForMovieRequirement(req);
+        res.json({'status': 200, msg: "movie updated", o});
+    })
+    .post((req,res)=>{
+        console.log(req.body);
+        var o=getJSONObjectForMovieRequirement(req);
+        res.json({'status': 200, msg: "movie saved", o});
+    })
+
+    .all((req, res)=>{
+        // Any other HTTP Method
+        // Returns a message stating that the HTTP method is unsupported.
+        res.status(405).send({ message: 'HTTP method not supported.' });
+    })
+;
+
+
     
+
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
 module.exports = app; // for testing only
