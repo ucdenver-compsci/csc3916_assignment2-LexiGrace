@@ -67,55 +67,34 @@ router.post('/signin', (req, res) => {
             res.json ({success: true, token: 'JWT ' + token});
         }
         else {
-            res.status(401).send({success: false, msg: 'Authentication failed.'});
+            res.status(401).send({success: false, msg: 'Authentication failed. Incorrect username and password combination'});
         }
     }
 });
 
 router.route('/movies')
-    //delete = complete
-    .delete(authController.isAuthenticated, (req, res) => {
-        var o = getJSONObjectForMovieRequirement(req);
-        var user = db.findOne(req.body.username);
-        movieID=(req.body);
-        if (!user) {
-            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});}
-        else {
-            if (req.body.password == user.password) {
-                var userToken = { id: user.id, username: user.username };
-                var token = jwt.sign(userToken, process.env.SECRET_KEY);
-                db.remove.movieID;
-                res.json({'status': 200, msg: "movie deleted", headers: o.headers, query: o.query, env: process.env.UNIQUE_KEY});
-                }
-            else{
-                res.status(401).send({success: false, msg: 'Authentication failed.'});
-                }}
-        res.json(o);
-    }
-    )
     .put(authJwtController.isAuthenticated, (req, res) => {
+        console.log(req.body)
+        var o = getJSONObjectForMovieRequirement(req);
+        o.status = 200;
+        o.message = "movie updated";
+        res.json(o);
+               
+    })
+    //delete = complete
+    .delete(authJwtController.isAuthenticated, (req, res) => {
         console.log(req.body);
         var o = getJSONObjectForMovieRequirement(req);
-        var user = db.findOne(req.body.username);
-        if (!user) {
-            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});}
-            else {
-                if (req.body.password == user.password) {
-                    var userToken = { id: user.id, username: user.username };
-                    var token = jwt.sign(userToken, process.env.SECRET_KEY);
-                    res.json({'status': 200, msg: "movie updated", o});
-                }
-                else{
-                    res.status(401).send({success: false, msg: 'Authentication failed.'});
-                }}
-        
+        o.status = 200;
+        o.message = "movie deleted";
         res.json(o);
+
     })
 
     .get((req, res) => {
         console.log(req.body);
         var o=getJSONObjectForMovieRequirement(req);
-        res.json({'status': 200, msg: "movie updated", o});
+        res.json({'status': 200, msg: "GET movies", o});
     })
     .post((req,res)=>{
         console.log(req.body);
